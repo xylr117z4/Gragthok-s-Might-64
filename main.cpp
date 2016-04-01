@@ -12,7 +12,8 @@ int main(){
     
     while (window.isOpen()){
         
-		gf::update();
+		//update units, projectiles and background
+		gf::update(elapsed);
 		
         //Render functions
         window.clear();

@@ -9,8 +9,11 @@ class Player{
 		sf::Sprite sprite;
 		sf::Vector2f size;
 		float speed;
+		float frameTime;
+		int frame;
 		//Sword!!!
-		void update();
+		void update(float elapsed);
+		void animate(float elapsed);
 		
 		~Player();
 };

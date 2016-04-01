@@ -4,7 +4,7 @@ Player::Player(){
 	
 }
 
-void Player::update(){
+void Player::update(float elapsed){
 	float e = 1/60;
 	if(sf::Keyboard::isKeyDown(sf::Keyboard::W)){
 		sprite.move(0,-speed*e);
@@ -17,6 +17,24 @@ void Player::update(){
 	}
 	if(sf::Keyboard::isKeyDown(sf::Keyboard::D)){
 		sprite.move(speed*e,0);
+	}
+	animate(elapsed);
+}
+
+void Player::animate(float elapsed){
+	frameCounter += elapsed;
+	if(frameCounter <= frameTime){
+		frame = 1;
+		temp.setTextureRect(sf::IntRect(9,0,9,9));
+	}
+	else if(frameCounter <= frameTime*2){
+		frame = 2;
+		temp.setTextureRect(sf::IntRect(18,0,9,9));
+	}
+	else if(frameCounter <= frameTime*3 || frameCounter > frameTime*3){
+		frame = 0;
+		frameCounter = 0;
+		temp.setTextureRect(sf::IntRect(0,0,9,9));
 	}
 }
 
