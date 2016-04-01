@@ -7,6 +7,8 @@ int main(){
     sf::RenderWindow window(sf::VideoMode(640, 640), "SFML window");
     sf::View mainView(sf::FloatRect(0, 0, 64, 64));
     window.setView(mainView);
+    
+    //create various game objects
     std::vector<Entity> entities;
     initTextures("listOfTextures.json");
     initPlayer(entities);
