@@ -1,6 +1,7 @@
 #include "globalHeader.h"
 #include "mainFunctions.h"
 #include "Player.h"
+#include "Entity.h"
 
 int main(){
     // Create the main window & set up view to upscale the 64x64 game by a factor of 10.
@@ -9,7 +10,7 @@ int main(){
     window.setView(mainView);
     
     //create various game objects
-    std::vector<Entity> entities;
+    std::vector<Entity*> entities;
     initTextures("listOfTextures.json");
     initPlayer(entities);
     

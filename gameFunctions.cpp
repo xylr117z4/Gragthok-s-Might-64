@@ -15,23 +15,22 @@ void gf::initTextures(std::string textureFileLocation){
 	}
 }
 
-void gf::initPlayer(std::vector<Entity>& entities){
-	Player temp;
-	temp.setTexture(textures[0]);
-	temp.setTextureRect(sf::IntRect(0,0,9,9));
-	temp.setOrigin(9/2,9/2);
-	temp.setPosition(32, 59.5);
-	temp.size = sf::Vector2f(9, 9);
-	temp.speed = 10;
-	entities.emplace_back();
-	entities[entities.back()].unit = temp;
+void gf::initPlayer(std::vector<Entity*> entities){
+	entities.emplace_back(new Player());
+	(*entities[0])->sprite.setTexture(textures[0]);
+	(*entities[0])->sprite.setTextureRect(sf::IntRect(0,0,9,9));
+	(*entities[0])->sprite.setOrigin(9/2,9/2);
+	(*entities[0])->sprite.setPosition(32, 59.5);
+	(*entities[0])->size = sf::Vector2f(9, 9);
+	(*entities[0])->speed = 10;
+	//with raw pointers user delete !
 }
 
-void gf::update(std::vector<Entity>& entities, float elapsed){
+void gf::update(std::vector<Entity*> entities, float elapsed){
 	for(unsigned int i = 0; i < entities.size(); ++i){
 		//update player
 		if(entities[i].type == 0){
-			entities[i].unit.player.update(elapsed);
+			(*entities[i])->update(elapsed);
 		}
 		
 		/*//update boglin
