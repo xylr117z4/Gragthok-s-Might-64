@@ -87,7 +87,7 @@ void in::CheckSwordAndBaddy(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderO
 	}
 	
 	if (orxString_Compare(recipientObjectName, "SwordObject") == 0){
-		in::CreateDeathSplatterAtObject(pstRecipientObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstSenderObject, "DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
 		orxObject_SetLifeTime(pstRecipientObject, 0);
 	}
