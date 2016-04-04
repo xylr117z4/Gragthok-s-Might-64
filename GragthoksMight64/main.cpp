@@ -1,5 +1,6 @@
 #include "orx.h"
 #include "Input.h"
+#include "BaddyHandler.h"
 
 /*Declare object pointers*/
 /*Player*/
@@ -13,19 +14,38 @@ orxSTATUS orxFASTCALL Init(){
 
 	/* Creates viewport */
 	orxViewport_CreateFromConfig("Viewport");
+	orxViewport_CreateFromConfig("ScreenViewport");
+	
+	/* Set up collision handler */
+	orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, in::PhysicsEventHandler);
 
 	/* Creates Character */
 	gragthok = orxObject_CreateFromConfig("GragthokObject");
 	gragthokSword = (orxOBJECT*)orxObject_GetChild(gragthok);
 	gragthokSwordSpawner = orxOBJECT_GET_STRUCTURE(gragthokSword, SPAWNER);
 	orxObject_Enable(gragthokSword, orxFALSE);
-	orxSpawner_Enable(gragthokSwordSpawner, orxFALSE);
+	orxSpawner_Reset(gragthokSwordSpawner);
 
 	/* Create Tile Map */
-	orxObject_CreateFromConfig("SandObject");
+	rd::loadMap("GrassMap");
+	
+	/*Spawn Baddies:
+	  I'll likely put this VVV function inside the BaddyHandler and have it use a for loop
+	  to spawn everything.*/
+	orxVECTOR boglinSpawn = {12,12,0};
+	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	
+	boglinSpawn = {24,12,0};
+	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	
+	boglinSpawn = {36,12,0};
+	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	
+	boglinSpawn = {48,12,0};
+	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
 	
 	/* Dummy Keep Alive Objects */
-	orxObject_CreateFromConfig("SwordObjectDummy");
+	orxObject_CreateFromConfig("Scene");
 
 	/* Done! */
 	return orxSTATUS_SUCCESS;
