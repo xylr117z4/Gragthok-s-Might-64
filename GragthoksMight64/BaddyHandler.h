@@ -3,12 +3,14 @@
 
 #include "orx.h"
 #include <iostream>
+#include <vector>
 
 class BaddyHandler
 {
 public:
 	BaddyHandler();
-	static void spawnBaddy(std::string type, orxVECTOR location);
+	std::vector<orxU64> baddies;
+	void spawnBaddy(std::string type, orxVECTOR location);
 	~BaddyHandler();
 
 };

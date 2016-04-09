@@ -4,9 +4,11 @@
 
 /*Declare object pointers*/
 /*Player*/
-orxOBJECT *gragthok;
+orxU64 gragthokID;
 orxOBJECT *gragthokSword;
 orxSPAWNER *gragthokSwordSpawner;
+
+BaddyHandler BoglinHandler;
 
 orxSTATUS orxFASTCALL Init(){
 	/* Displays a small hint in console */
@@ -20,8 +22,10 @@ orxSTATUS orxFASTCALL Init(){
 	orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, in::PhysicsEventHandler);
 
 	/* Creates Character */
-	gragthok = orxObject_CreateFromConfig("GragthokObject");
-	gragthokSword = (orxOBJECT*)orxObject_GetChild(gragthok);
+	gragthokID = orxStructure_GetGUID(orxObject_CreateFromConfig("GragthokObject"));
+	std::cout << gragthokID << "\n\n-------------------------\n";
+	
+	gragthokSword = (orxOBJECT*)orxObject_GetChild(orxOBJECT(orxStructure_Get(gragthokID)));
 	gragthokSwordSpawner = orxOBJECT_GET_STRUCTURE(gragthokSword, SPAWNER);
 	orxObject_Enable(gragthokSword, orxFALSE);
 	orxSpawner_Reset(gragthokSwordSpawner);
@@ -32,17 +36,14 @@ orxSTATUS orxFASTCALL Init(){
 	/*Spawn Baddies:
 	  I'll likely put this VVV function inside the BaddyHandler and have it use a for loop
 	  to spawn everything.*/
-	orxVECTOR boglinSpawn = {12,12,0};
-	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	orxVECTOR boglinSpawn = {27,-12,0};
+	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
 	
-	boglinSpawn = {24,12,0};
-	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	boglinSpawn = {7,-12,0};
+	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
 	
-	boglinSpawn = {36,12,0};
-	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
-	
-	boglinSpawn = {48,12,0};
-	BaddyHandler::spawnBaddy("BoglinObject", boglinSpawn);
+	boglinSpawn = {45,-12,0};
+	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
 	
 	/* Dummy Keep Alive Objects */
 	orxObject_CreateFromConfig("Scene");
@@ -57,7 +58,7 @@ orxSTATUS orxFASTCALL Run(){
 	
 	orxSTATUS eResult = orxSTATUS_SUCCESS;
 	
-	in::handleInput(eResult, gragthok, gragthokSword, gragthokSwordSpawner);
+	in::handleInput(eResult, gragthokID, gragthokSword, gragthokSwordSpawner);
 
 	/* Done! */
 	return eResult;
