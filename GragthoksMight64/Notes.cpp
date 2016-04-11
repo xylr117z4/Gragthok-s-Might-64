@@ -15,15 +15,15 @@ namespace gf{
 
 /* main.cpp */
 
-static std::stack<function<bool()>> stateStack;
+static std::stack<std::function<bool()>> stateStack;
 
 void init(){
-  stateStack.push(runGame);
-  stateStack.push(loadGame);
-  stateStack.push(runMenu);
-  stateStack.push(loadMenu);
-  stateStack.push(runIntro);
-  stateStack.push(loadIntro);
+  stateStack.push(gf::runGame);
+  stateStack.push(gf::loadGame);
+  stateStack.push(gf::runMenu);
+  stateStack.push(gf::loadMenu);
+  stateStack.push(gf::runIntro);
+  stateStack.push(gf::loadIntro);
 }
 
 int main(){
