@@ -34,6 +34,8 @@ void loadMap(std::string mapName){
 	orxConfig_pop();
 }
 
+
+/* Working function below */
 	std::stringstream ss;
 	std::vector<std::vector<std::string>> tileList;
 	std::vector<std::vector<std::string>> origin = { { "1", "2", "3", "End" }, { "5", "6", "7", "End" }, { "9", "10", "11", "End" }, { "13", "14", "15", "End" }, {"End"} };
