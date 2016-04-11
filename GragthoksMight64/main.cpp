@@ -75,6 +75,6 @@ void orxFASTCALL Exit(){
 int main(int argc, char **argv){
 	/* Executes a new instance of tutorial */
 	orx_Execute(argc, argv, Init, Run, Exit);
-
+	
 	return EXIT_SUCCESS;
 }
