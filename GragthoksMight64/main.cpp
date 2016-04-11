@@ -1,53 +1,49 @@
 #include "orx.h"
 #include "Input.h"
 #include "BaddyHandler.h"
+#include <stack>
+#include <functional>
 
-/*Declare object pointers*/
-/*Player*/
-orxU64 gragthokID;
-orxOBJECT *gragthokSword;
-orxSPAWNER *gragthokSwordSpawner;
-
-BaddyHandler BoglinHandler;
+/* Declare State Stack */
+std::stack<std::function<bool()>> stateStack;
 
 orxSTATUS orxFASTCALL Init(){
-	/* Displays a small hint in console */
-	orxLOG("\nGragthok's Might 64!!!\n");
+	stateStack.push_back(sh::runGame());
+	stateStack.push_back(sh::loadGame());
+	stateStack.push_back(sh::runMenu());
+	stateStack.push_back(sh::loadMenu());
+	stateStack.push_back(sh::runIntro());
+	stateStack.push_back(sh::loadIntro());
+	
+	/*
+		#include <iostream>
+		#include <stack>
+		#include <functional>
+		#include <deque>
+		#include <vector>
+		#include <conio.h>
 
-	/* Creates viewport */
-	orxViewport_CreateFromConfig("Viewport");
-	orxViewport_CreateFromConfig("ScreenViewport");
-	
-	/* Set up collision handler */
-	orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, in::PhysicsEventHandler);
+		void sayHello(){
+			std::cout << "Hello!! \n\n";
+		}
 
-	/* Creates Character */
-	gragthokID = orxStructure_GetGUID(orxObject_CreateFromConfig("GragthokObject"));
-	std::cout << gragthokID << "\n\n-------------------------\n";
-	
-	gragthokSword = (orxOBJECT*)orxObject_GetChild(orxOBJECT(orxStructure_Get(gragthokID)));
-	gragthokSwordSpawner = orxOBJECT_GET_STRUCTURE(gragthokSword, SPAWNER);
-	orxObject_Enable(gragthokSword, orxFALSE);
-	orxSpawner_Reset(gragthokSwordSpawner);
+		void sayGoodbye(){
+			std::cout << "Goodbye!! \n\n";
+		}
 
-	/* Create Tile Map */
-	rd::loadMap("GrassMap");
+		int _tmain(int argc, _TCHAR* argv[])
+		{
+			std::stack<std::function<void()>> stateStack;
+			stateStack.push(sayGoodbye);
+			stateStack.push(sayHello);
+			stateStack.top()();
+			stateStack.pop();
+			stateStack.top()();
+			_getch();
+			return 0;
+		}
+	*/
 	
-	/*Spawn Baddies:
-	  I'll likely put this VVV function inside the BaddyHandler and have it use a for loop
-	  to spawn everything.*/
-	orxVECTOR boglinSpawn = {27,-12,0};
-	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
-	
-	boglinSpawn = {7,-12,0};
-	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
-	
-	boglinSpawn = {45,-12,0};
-	BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
-	
-	/* Dummy Keep Alive Objects */
-	orxObject_CreateFromConfig("Scene");
-
 	/* Done! */
 	return orxSTATUS_SUCCESS;
 }
@@ -58,7 +54,12 @@ orxSTATUS orxFASTCALL Run(){
 	
 	orxSTATUS eResult = orxSTATUS_SUCCESS;
 	
-	in::handleInput(eResult, gragthokID, gragthokSword, gragthokSwordSpawner);
+	if(stateStack.top()()){
+		stateStack.pop();
+		if(stateStack.empty()){
+			return orxSTATUS_FAILURE;
+		}
+	}
 
 	/* Done! */
 	return eResult;

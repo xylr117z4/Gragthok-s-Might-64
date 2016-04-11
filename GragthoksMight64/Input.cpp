@@ -2,7 +2,7 @@
 
 const int TILES_ACROSS = 5;
 
-void in::handleInput(orxSTATUS& eResult, int gragthokID, orxOBJECT* gragthokSword, orxSPAWNER* gragthokSwordSpawner){
+bool in::handleInput(){
 	orxConfig_PushSection("GragthokVariables");
 	orxFLOAT speed = orxConfig_GetFloat("GragthokSpeed");
 	orxConfig_PopSection();
@@ -13,6 +13,7 @@ void in::handleInput(orxSTATUS& eResult, int gragthokID, orxOBJECT* gragthokSwor
 	/*Quit?*/
 	if(orxInput_IsActive("Quit")){
 		eResult = orxSTATUS_FAILURE;
+		return true;
 	}
 	
 	/*Movement*/
@@ -57,8 +58,9 @@ void in::handleInput(orxSTATUS& eResult, int gragthokID, orxOBJECT* gragthokSwor
 		}
 	}
 	
-	
 	/*Abilities*/
+	
+	return false;
 }
 
 void orxFASTCALL in::CanShoot(const orxCLOCK_INFO *_pstInfo, void *_pContext){
@@ -138,6 +140,78 @@ void in::CreateDeathSplatterAtObject(orxOBJECT *object, orxSTRING exploderObject
 	orxOBJECT *deathSplatter = orxObject_CreateFromConfig("DeathObject");
 	orxObject_SetPosition(deathSplatter, &objectVector);
 }
+
+//inits
+	bool sh::loadIntro(){
+		return true;
+	}
+	bool sh::loadMenu(){
+		return true;
+	}
+	bool sh::loadGame(){
+		/* Displays a small hint in console */
+		orxLOG("\nGragthok's Might 64!!!\n");
+
+		/* Creates viewport */
+		orxViewport_CreateFromConfig("Viewport");
+		orxViewport_CreateFromConfig("ScreenViewport");
+		
+		/* Set up collision handler */
+		orxEvent_AddHandler(orxEVENT_TYPE_PHYSICS, in::PhysicsEventHandler);
+
+		/* Creates Character */
+		gragthokID = orxStructure_GetGUID(orxObject_CreateFromConfig("GragthokObject"));
+		std::cout << gragthokID << "\n\n-------------------------\n";
+		
+		gragthokSword = (orxOBJECT*)orxObject_GetChild(orxOBJECT(orxStructure_Get(gragthokID)));
+		gragthokSwordSpawner = orxOBJECT_GET_STRUCTURE(gragthokSword, SPAWNER);
+		orxObject_Enable(gragthokSword, orxFALSE);
+		orxSpawner_Reset(gragthokSwordSpawner);
+
+		/* Create Tile Map */
+		rd::loadMap("GrassMap");
+		
+		/*Spawn Baddies:
+		  I'll likely put this VVV function inside the BaddyHandler and have it use a for loop
+		  to spawn everything.
+		orxVECTOR boglinSpawn = {27,-12,0};
+		BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
+		
+		boglinSpawn = {7,-12,0};
+		BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);
+		
+		boglinSpawn = {45,-12,0};
+		BoglinHandler.spawnBaddy("BoglinObject", boglinSpawn);*/
+		
+		/* Dummy Keep Alive Objects */
+		orxObject_CreateFromConfig("Scene");
+		
+		return true;
+	}
+//runs
+	bool sh::runIntro(){
+		bool done = false;
+		
+		if(done){
+			return true;
+		}
+	}
+	bool sh::runMenu(){
+		bool done = false;
+		
+		if(done){
+			return true;
+		}
+	}
+	bool sh::runGame(){
+		bool done = false;
+		
+		done = in::handleInput();
+		
+		if(done){
+			return true;
+		}
+	}
 
 void rd::loadMap(std::string mapName){
 	orxOBJECT *map;
