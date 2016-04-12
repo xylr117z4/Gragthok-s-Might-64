@@ -4,45 +4,31 @@
 #include <stack>
 #include <functional>
 
+/* Please read the included dbad-license.txt file in full before altering any code. */
+
 /* Declare State Stack */
 std::stack<std::function<bool()>> stateStack;
 
 orxSTATUS orxFASTCALL Init(){
-	stateStack.push_back(sh::runGame());
-	stateStack.push_back(sh::loadGame());
-	stateStack.push_back(sh::runMenu());
-	stateStack.push_back(sh::loadMenu());
-	stateStack.push_back(sh::runIntro());
-	stateStack.push_back(sh::loadIntro());
+	/* Creates viewport */
+	orxViewport_CreateFromConfig("Viewport");
+	orxViewport_CreateFromConfig("ScreenViewport");
 	
-	/*
-		#include <iostream>
-		#include <stack>
-		#include <functional>
-		#include <deque>
-		#include <vector>
-		#include <conio.h>
-
-		void sayHello(){
-			std::cout << "Hello!! \n\n";
-		}
-
-		void sayGoodbye(){
-			std::cout << "Goodbye!! \n\n";
-		}
-
-		int _tmain(int argc, _TCHAR* argv[])
-		{
-			std::stack<std::function<void()>> stateStack;
-			stateStack.push(sayGoodbye);
-			stateStack.push(sayHello);
-			stateStack.top()();
-			stateStack.pop();
-			stateStack.top()();
-			_getch();
-			return 0;
-		}
-	*/
+	/* Watch for ending animations */
+	orxEvent_AddHandler(orxEVENT_TYPE_ANIM, in::AnimEventHandler);
+	
+	stateStack.push(sh::runGame);
+	stateStack.push(sh::loadGrassLevel);
+	stateStack.push(sh::runIntro);
+	stateStack.push(sh::loadGrassCard);
+	stateStack.push(sh::runMenu);
+	stateStack.push(sh::loadMenu);
+	stateStack.push(sh::runIntro);
+	stateStack.push(sh::loadIntro);
+	stateStack.push(sh::runIntro);
+	stateStack.push(sh::loadOrxLogo);
+	stateStack.push(sh::runIntro);
+	stateStack.push(sh::loadTeamLogo);
 	
 	/* Done! */
 	return orxSTATUS_SUCCESS;

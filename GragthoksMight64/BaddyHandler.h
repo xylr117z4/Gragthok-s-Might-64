@@ -11,6 +11,7 @@ public:
 	BaddyHandler();
 	std::vector<orxU64> baddies;
 	void spawnBaddy(std::string type, orxVECTOR location);
+	void clearBaddies();
 	~BaddyHandler();
 
 };

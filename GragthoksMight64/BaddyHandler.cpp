@@ -8,6 +8,15 @@ void BaddyHandler::spawnBaddy(std::string type, orxVECTOR location){
 	orxObject_SetPosition(orxOBJECT(orxStructure_Get(baddies[baddies.size()-1])), &location);
 }
 
+void BaddyHandler::clearBaddies(){
+	for(unsigned int i = 0; i < baddies.size(); ++i){
+		if(orxStructure_Get(baddies[i]) != orxNULL){
+			orxObject_SetLifeTime(orxOBJECT(orxStructure_Get(baddies[i])), 0);
+		}
+	}
+	baddies.empty();
+}
+
 BaddyHandler::~BaddyHandler(){
 }
 
