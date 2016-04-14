@@ -5,9 +5,9 @@
 #include <functional>
 
 /* Please read the included dbad-license.txt file in full before altering any code. */
-
-/* Declare State Stack */
 std::stack<std::function<bool()>> stateStack;
+std::stack<std::function<bool()>> stackOfHolding;
+bool clearStack = false;
 
 orxSTATUS orxFASTCALL Init(){
 	/* Creates viewport */
@@ -42,6 +42,18 @@ orxSTATUS orxFASTCALL Run(){
 	
 	if(stateStack.top()()){
 		stateStack.pop();
+		
+		while(!stackOfHolding.empty()){
+			stateStack.push(stackOfHolding.top());
+			stackOfHolding.pop();
+		}
+		
+		if(clearStack){
+			while(!stateStack.empty()){
+				stateStack.pop();
+			}
+		}
+		
 		if(stateStack.empty()){
 			return orxSTATUS_FAILURE;
 		}

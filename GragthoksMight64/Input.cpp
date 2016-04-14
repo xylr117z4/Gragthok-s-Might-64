@@ -15,6 +15,7 @@ orxOBJECT* menuArrow;
 orxU64 gragthokID;
 orxOBJECT *gragthokSword;
 orxSPAWNER *gragthokSwordSpawner;
+int gragthokLives = 3;
 
 /* Level */
 orxOBJECT *grassBackground;
@@ -24,6 +25,9 @@ orxOBJECT *dummies;
 BaddyHandler BoglinHandler;
 
 bool endState = false;
+bool respawned = false;
+bool startGame = true; // for main menu
+bool restartGame = false; // for game over
 
 bool in::handleInput(){
 	orxConfig_PushSection("GragthokVariables");
@@ -36,14 +40,7 @@ bool in::handleInput(){
 	/*Quit?*/
 	if(orxInput_IsActive("Quit") && orxInput_HasNewStatus("Quit")){
 		endState = true;
-		BoglinHandler.clearBaddies();
-		orxObject_SetLifeTime(grassBackground, 0);
-		orxObject_SetLifeTime(dummies, 0);
-		if(orxStructure_Get(gragthokID) != orxNULL){
-			orxObject_SetLifeTime(orxOBJECT(orxStructure_Get(gragthokID)), 0);
-			orxObject_SetLifeTime(gragthokSword, 0);
-			orxObject_SetLifeTime((orxOBJECT*)gragthokSwordSpawner, 0);
-		}
+		sh::tearDownGame();
 	}
 	
 	/*Movement*/
@@ -97,11 +94,13 @@ bool in::handleMenuInput(){
 	if(orxInput_IsActive("GoUp") && orxInput_HasNewStatus("GoUp")){
 		//move arrow up
 		orxVECTOR newArrowPos = {0,0,0};
+		startGame = true;
 		orxObject_SetPosition(menuArrow, &newArrowPos);
 	}
 	if(orxInput_IsActive("GoDown") && orxInput_HasNewStatus("GoDown")){
 		//move arrow down
 		orxVECTOR newArrowPos = {0,8,0};
+		startGame = false;
 		orxObject_SetPosition(menuArrow, &newArrowPos);
 	}
 	
@@ -110,6 +109,41 @@ bool in::handleMenuInput(){
 		orxObject_SetLifeTime(menuBackground, 0);
 		orxObject_SetLifeTime(menuArrow, 0);
 		orxObject_SetLifeTime(menuButtons, 0);
+		if(!startGame){
+			stackOfHolding.push(sh::killGame);
+		}
+	}
+	return false;
+}
+
+bool in::handleGameOverInput(){	
+	if(orxInput_IsActive("GoUp") && orxInput_HasNewStatus("GoUp")){
+		//move arrow up
+		orxVECTOR newArrowPos = {-18,0,0};
+		restartGame = true;
+		orxObject_SetPosition(menuArrow, &newArrowPos);
+		orxObject_SetTargetAnim(menuBackground, "GameOverContinue");
+	}
+	if(orxInput_IsActive("GoDown") && orxInput_HasNewStatus("GoDown")){
+		//move arrow down
+		orxVECTOR newArrowPos = {-18,8,0};
+		restartGame = false;
+		orxObject_SetPosition(menuArrow, &newArrowPos);
+		orxObject_SetTargetAnim(menuBackground, "GameOverRun");
+	}
+	
+	if(orxInput_IsActive("Shoot") && orxInput_HasNewStatus("Shoot")){
+		endState = true;
+		orxObject_SetLifeTime(menuBackground, 0);
+		orxObject_SetLifeTime(menuArrow, 0);
+		orxObject_SetLifeTime(menuButtons, 0);
+		if(restartGame){
+			stackOfHolding.push(sh::loadGrassLevel);
+			stackOfHolding.push(sh::runGame);
+		}
+		else{
+			stackOfHolding.push(sh::killGame);
+		}
 	}
 	return false;
 }
@@ -148,14 +182,11 @@ orxSTATUS orxFASTCALL in::PhysicsEventHandler(const orxEVENT *_pstEvent){
 }
 
 orxSTATUS orxFASTCALL in::AnimEventHandler(const orxEVENT *_pstEvent){
-	orxANIM_EVENT_PAYLOAD *pstPayload;
-	 
-	pstPayload = (orxANIM_EVENT_PAYLOAD *)_pstEvent->pstPayload;
 	
 	const orxSTRING animName = orxObject_GetName(orxOBJECT(_pstEvent->hRecipient));
 	
 	if(in::CheckIntroAnimEnd(_pstEvent->eID, animName)){
-		endState = true;		
+		endState = true;
 		orxOBJECT *pstSenderObject = orxOBJECT(_pstEvent->hSender);
 		orxObject_SetLifeTime(pstSenderObject, 0);
 	}
@@ -194,17 +225,18 @@ bool in::CheckIntroAnimEnd(int eID, const orxSTRING animName){
 	if(eID == orxANIM_EVENT_LOOP && orxString_Compare(animName, "GrassCardObject") == 0){
 		return true;
 	}
+	return false;
 }
 
 void in::CheckSwordAndBaddy(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName){
 	if (orxString_Compare(senderObjectName, "SwordObject") == 0){
-		in::CreateDeathSplatterAtObject(pstRecipientObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstRecipientObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
 		orxObject_SetLifeTime(pstRecipientObject, 0);
 	}
 	
 	if (orxString_Compare(recipientObjectName, "SwordObject") == 0){
-		in::CreateDeathSplatterAtObject(pstSenderObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstSenderObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
 		orxObject_SetLifeTime(pstRecipientObject, 0);
 	}
@@ -212,28 +244,32 @@ void in::CheckSwordAndBaddy(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderO
 
 void in::CheckSpearAndGragthok(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName){
 	if (orxString_Compare(senderObjectName, "SpearObject") == 0 && orxString_Compare(recipientObjectName, "GragthokObject") == 0){
-		in::CreateDeathSplatterAtObject(pstRecipientObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstRecipientObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
 		orxObject_SetLifeTime(pstRecipientObject, 0);
+		sh::respawn();
 	}
 	
 	if (orxString_Compare(recipientObjectName, "SpearObject") == 0 && orxString_Compare(senderObjectName, "GragthokObject") == 0){
-		in::CreateDeathSplatterAtObject(pstSenderObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstSenderObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
 		orxObject_SetLifeTime(pstRecipientObject, 0);
+		sh::respawn();
 	}
 }
 
 
 void in::CheckBoglinAndGragthok(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName){
 	if (orxString_Compare(senderObjectName, "BoglinObject") == 0 && orxString_Compare(recipientObjectName, "GragthokObject") == 0){
-		in::CreateDeathSplatterAtObject(pstRecipientObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstRecipientObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstRecipientObject, 0);
+		sh::respawn();
 	}
 	
 	if (orxString_Compare(recipientObjectName, "BoglinObject") == 0 && orxString_Compare(senderObjectName, "GragthokObject") == 0){
-		in::CreateDeathSplatterAtObject(pstSenderObject, "DeathObject");
+		in::CreateDeathSplatterAtObject(pstSenderObject, (orxCHAR*)"DeathObject");
 		orxObject_SetLifeTime(pstSenderObject, 0);
+		sh::respawn();
 	}
 }
 
@@ -288,9 +324,12 @@ void in::CreateDeathSplatterAtObject(orxOBJECT *object, orxSTRING exploderObject
 		
 		/* Create Grass Card Anim */
 		currentIntro = orxObject_CreateFromConfig("GrassCardObject");
+		
+		return true;
 	}
 	bool sh::loadGrassLevel(){
 		endState = false;
+		respawned = false;
 		
 		/* Displays a small hint in console */
 		orxLOG("\nGragthok's Might 64!!!\n");
@@ -328,6 +367,20 @@ void in::CreateDeathSplatterAtObject(orxOBJECT *object, orxSTRING exploderObject
 		
 		return true;
 	}
+	bool sh::loadGameOver(){
+		endState = false;
+		
+		/* Create Intro Anim */
+		menuBackground = (orxOBJECT*)orxObject_CreateFromConfig("GameOverObject");
+		menuButtons = (orxOBJECT*)orxObject_CreateFromConfig("GameOverButtonsObject");
+		menuArrow = (orxOBJECT*)orxObject_CreateFromConfig("MenuArrowObject");
+		
+		orxVECTOR newArrowPos = {-18,8,0};
+		orxObject_SetPosition(menuArrow, &newArrowPos);
+		orxObject_SetTargetAnim(menuBackground, "GameOverRun");
+		
+		return true;
+	}
 //runs
 	bool sh::runIntro(){
 		in::handleIntroInput();
@@ -337,7 +390,50 @@ void in::CreateDeathSplatterAtObject(orxOBJECT *object, orxSTRING exploderObject
 		in::handleMenuInput();
 		return endState;
 	}
+	bool sh::runGameOver(){
+		in::handleGameOverInput();
+		return endState;
+	}
 	bool sh::runGame(){
 		in::handleInput();
 		return endState;
+	}
+	bool sh::respawn(){
+		if(!respawned){
+			respawned = true;
+			if(gragthokLives > 0){
+				--gragthokLives;
+				stackOfHolding.push(sh::loadGrassCard);
+				stackOfHolding.push(sh::runIntro);
+				//level resets respanwed
+				stackOfHolding.push(sh::loadGrassLevel);
+				stackOfHolding.push(sh::runGame);
+				std::cout << "only pushing once, game?\n\n";
+				tearDownGame();
+				endState = true;
+			}
+			else{
+				std::cout << "only pushing once, over?\n\n";
+				stackOfHolding.push(sh::loadGameOver);
+				stackOfHolding.push(sh::runGameOver);
+				tearDownGame();
+				endState = true;
+			}
+		}
+		return false;
+	}
+	bool sh::tearDownGame(){
+		BoglinHandler.clearBaddies();
+		orxObject_SetLifeTime(grassBackground, 0);
+		orxObject_SetLifeTime(dummies, 0);
+		if(orxStructure_Get(gragthokID) != orxNULL){
+			orxObject_SetLifeTime(orxOBJECT(orxStructure_Get(gragthokID)), 0);
+			orxObject_SetLifeTime(gragthokSword, 0);
+			orxObject_SetLifeTime((orxOBJECT*)gragthokSwordSpawner, 0);
+		}
+		return false;
+	}
+	bool sh::killGame(){
+		clearStack = true;
+		return true;
 	}
