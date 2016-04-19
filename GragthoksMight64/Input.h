@@ -19,14 +19,17 @@ namespace in{
 	bool handleMenuInput();
 	bool handleGameOverInput();
 	bool handleIntroInput();
+	bool bossHandler();
 	void orxFASTCALL CanShoot(const orxCLOCK_INFO *_pstInfo, void *_pContext);
 	orxSTATUS orxFASTCALL PhysicsEventHandler(const orxEVENT *_pstEvent);
 	orxSTATUS orxFASTCALL AnimEventHandler(const orxEVENT *_pstEvent);
-	bool CheckIntroAnimEnd(int eID, const orxSTRING animName);
+	bool CheckIntroAnimEnd(int eID, const orxSTRING objectName, const orxSTRING animName);
 	void CreateDeathSplatterAtObject(orxOBJECT *object, orxSTRING exploderObjectName);
 	void CheckSwordAndBaddy(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName);
-	void CheckSpearAndGragthok(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName);
-	void CheckBoglinAndGragthok(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName);
+	bool BoglinNameListCheck(orxSTRING objectName);
+	bool BoundaryNameListCheck(orxSTRING senderObjectName, orxSTRING recipientObjectName);
+	void CheckGragthok(orxOBJECT *pstRecipientObject, orxOBJECT *pstSenderObject, orxSTRING senderObjectName, orxSTRING recipientObjectName);
+	void SpawnRandomBaddies();
 }
 
 namespace sh{
@@ -37,7 +40,9 @@ namespace sh{
 	bool loadMenu();
 	bool loadGrassCard();
 	bool loadGrassLevel();
+	bool loadLiveScreen();
 	bool loadGameOver();
+	bool loadGameDone();
 	//runs
 	bool runIntro();
 	bool runMenu();

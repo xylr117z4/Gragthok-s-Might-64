@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="6" height="400" tilewidth="12" tileheight="12" nextobjectid="1">
+ <tileset firstgid="1" name="GrassTiles" tilewidth="12" tileheight="12" tilecount="24" columns="4">
+  <image source="lowerGrassTiles.png" width="48" height="72"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="6" height="400">
+  <data encoding="base64" compression="zlib">
+   eJzVWe0OwyAIbE22vv8bL0tqQgitKB+HP0hX1+hxhxTsdRzH5WRN+P0VnvuPnbf1sX7/ua2P83stBmndS1iPj2vWG83tZRK+jlH7HNUkC/dqzHhbFX/bhJZInyP4itR3BceKDoj9fpIrz4d8jPtA8Vr4z4pZD76942xV8zfONHw++WGdd0ZTZN5E5IvqnHSMlnopug4YzTnSNbJee9Kbzyfl1kb+i+RnhTtUfrb4WK0eyPQd5QfFFhEzs1xmx231HugN8y54JX5HOnvEQUQ+aU7zovqp6P01m3N2MI438z1l6U1R/HN+quhdEZeXrhXqKy2fiDqvAj8obmiMUR6ie4Ed+KyQA2bwoTk9HzB4xlJ1TSSb0SWi30fbGy7tO86qexQ3GlyZfWtmje3NKfJcyuuso8IetOhr+daA8pNj7uOo/ZVhEo7o87oMH9C4d/iWbeVoBx853gqxTX2MxjDS6Ae6tj7N
+  </data>
+ </layer>
+</map>
